@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "external.api.general.url",
+    "type": "java.lang.String",
+    "description": "testing URL"
+  },
+  {
+    "name": "external.api.yts.url",
+    "type": "java.lang.String",
+    "description": "YTS api"
+  },
+  {
+    "name": "external.api.pirateBay.url",
+    "type": "java.lang.String",
+    "description": "pirateBay API"
+  }
+]}
