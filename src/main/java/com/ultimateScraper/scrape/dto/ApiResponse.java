@@ -7,6 +7,7 @@ public class ApiResponse {
 	    private int length;
 	    private boolean cacheHit;
 	    private double elapsed;
+	    private String errMessage;
 	    private List<DataItem> data;
 	    
 		public String getStatus() {
@@ -39,6 +40,10 @@ public class ApiResponse {
 		public void setData(List<DataItem> data) {
 			this.data = data;
 		}
-	
-
+		public String getErrMessage() {
+			return errMessage;
+		}
+		public void setErrMessage(String errMessage) {
+			this.errMessage = errMessage;
+		}
 }

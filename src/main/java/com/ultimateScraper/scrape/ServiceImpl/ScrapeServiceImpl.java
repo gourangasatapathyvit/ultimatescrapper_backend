@@ -1,9 +1,12 @@
 package com.ultimateScraper.scrape.ServiceImpl;
 
-import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,23 +17,17 @@ import com.ultimateScraper.scrape.Services.ScrapeService;
 import com.ultimateScraper.scrape.dto.ApiResponse;
 import com.ultimateScraper.scrape.dto.ReqDto;
 import com.ultimateScraper.scrape.dto.RequestBodyParam;
+import com.ultimateScraper.scrape.utility.CustomLimiter.RateLimitFilter;
+import com.ultimateScraper.scrape.utility.CustomLimiter.RateLimiterService;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@EnableCaching
 public class ScrapeServiceImpl implements ScrapeService {
 
 	@Value("${external.api.general.url}") // Inject the URL from properties
 	private String apiUrl;
-
-	@Value("${resilience4j.ratelimiter.configs.getAllRes.limit-for-period}")
-	private int limitForPeriod;
-
-	@Value("${resilience4j.ratelimiter.configs.getAllRes.limit-refresh-period}")
-	private Duration limitRefreshPeriod;
-
-	@Value("${resilience4j.ratelimiter.configs.getAllRes.timeout-duration}")
-	private Duration timeoutDuration;
 
 	private RestTemplate restTemplate;
 
@@ -42,10 +39,10 @@ public class ScrapeServiceImpl implements ScrapeService {
 
 	public ScrapeServiceImpl(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
+
 	}
 
 	@Override
-	@RateLimiter(name = "getAllRes", fallbackMethod = "fallbackMethodForGetAllRes")
 	public ApiResponse getAllRes(RequestBodyParam searchTerm) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -65,12 +62,6 @@ public class ScrapeServiceImpl implements ScrapeService {
 		System.out.println(response);
 
 		return response;
-	}
-
-	public ApiResponse fallbackMethodForGetAllRes(RequestBodyParam searchTerm, Throwable throwable) {
-		System.out.println("lorem");
-		return null;
-		// Handle fallback logic here
 	}
 
 }
