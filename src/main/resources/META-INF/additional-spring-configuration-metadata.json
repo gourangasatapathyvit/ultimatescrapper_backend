@@ -13,5 +13,10 @@
     "name": "external.api.pirateBay.url",
     "type": "java.lang.String",
     "description": "pirateBay API"
+  },
+  {
+    "name": "auto.refresh.intervalInMillis",
+    "type": "java.lang.String",
+    "description": "time duration for flushing redish database"
   }
 ]}

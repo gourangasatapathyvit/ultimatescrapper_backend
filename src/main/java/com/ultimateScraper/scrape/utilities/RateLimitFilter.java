@@ -1,4 +1,4 @@
-package com.ultimateScraper.scrape.utility.CustomLimiter;
+package com.ultimateScraper.scrape.utilities;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -23,10 +23,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class RateLimitFilter implements Filter {
 
 	private final RedisTemplate<String, Integer> redisTemplate;
-	private final RateLimiterService rateLimiterService;
+	private final GenericService rateLimiterService;
 
 	@Autowired
-	public RateLimitFilter(RedisTemplate<String, Integer> redisTemplate, RateLimiterService rateLimiterService) {
+	public RateLimitFilter(RedisTemplate<String, Integer> redisTemplate, GenericService rateLimiterService) {
 		this.redisTemplate = redisTemplate;
 		this.rateLimiterService = rateLimiterService;
 	}

@@ -19,8 +19,9 @@ import com.ultimateScraper.scrape.Services.ScrapeService;
 import com.ultimateScraper.scrape.dto.ApiResponse;
 import com.ultimateScraper.scrape.dto.ReqDto;
 import com.ultimateScraper.scrape.dto.RequestBodyParam;
-import com.ultimateScraper.scrape.utility.CustomLimiter.RateLimitFilter;
-import com.ultimateScraper.scrape.utility.CustomLimiter.RateLimiterService;
+import com.ultimateScraper.scrape.dto.Yts;
+import com.ultimateScraper.scrape.utilities.RateLimitFilter;
+import com.ultimateScraper.scrape.utilities.GenericService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -28,8 +29,11 @@ import jakarta.servlet.http.HttpServletRequest;
 @EnableCaching
 public class ScrapeServiceImpl implements ScrapeService {
 
-	@Value("${external.api.general.url}") // Inject the URL from properties
+	@Value("${external.api.general.url}")
 	private String apiUrl;
+
+	@Value("${external.api.yts.url}")
+	private String YtsUrl;
 
 	private RestTemplate restTemplate;
 
@@ -63,6 +67,15 @@ public class ScrapeServiceImpl implements ScrapeService {
 		ApiResponse response = restTemplate.postForObject(apiUrl, requestEntity, ApiResponse.class);
 
 		System.out.println(response);
+
+		return response;
+	}
+
+	@Override
+	@Cacheable(value = "getYtsResp", key = "#input")
+	public Yts getYtsRes(String input) {
+
+		Yts response = restTemplate.getForObject(YtsUrl + input, Yts.class);
 
 		return response;
 	}
