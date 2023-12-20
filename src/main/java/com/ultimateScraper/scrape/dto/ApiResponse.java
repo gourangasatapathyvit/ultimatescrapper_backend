@@ -1,8 +1,9 @@
 package com.ultimateScraper.scrape.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ApiResponse {
+public class ApiResponse implements Serializable{
 	 private String status;
 	    private int length;
 	    private boolean cacheHit;

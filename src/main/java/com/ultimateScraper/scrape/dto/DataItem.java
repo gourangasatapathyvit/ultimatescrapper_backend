@@ -1,6 +1,8 @@
 package com.ultimateScraper.scrape.dto;
 
-public class DataItem {
+import java.io.Serializable;
+
+public class DataItem implements Serializable{
 	 private String name;
      private String magnet;
      private int seeders;

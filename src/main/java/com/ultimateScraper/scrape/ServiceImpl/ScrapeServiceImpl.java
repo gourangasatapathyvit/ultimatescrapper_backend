@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -31,18 +33,19 @@ public class ScrapeServiceImpl implements ScrapeService {
 
 	private RestTemplate restTemplate;
 
-	@Override
-	public String test() {
-		// TODO Auto-generated method stub
-		return "lorem";
-	}
-
 	public ScrapeServiceImpl(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
 
 	}
 
 	@Override
+	public String test() {
+		// TODO Auto-generated method stub
+		return "lorem";
+	}
+
+	@Override
+	@Cacheable(value = "getAllRes", key = "#searchTerm.inputQuery")
 	public ApiResponse getAllRes(RequestBodyParam searchTerm) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);

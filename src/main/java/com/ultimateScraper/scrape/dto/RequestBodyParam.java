@@ -1,8 +1,9 @@
 package com.ultimateScraper.scrape.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RequestBodyParam {
+public class RequestBodyParam implements Serializable{
 	private String inputQuery;
 	private List<String> source;
 	private String catagory;
