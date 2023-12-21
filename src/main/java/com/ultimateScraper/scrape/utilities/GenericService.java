@@ -1,5 +1,9 @@
 package com.ultimateScraper.scrape.utilities;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +47,23 @@ public class GenericService {
 	public void evictAllCacheValues() {
 		System.out.println("lorem1");
 		redisTemplate.getConnectionFactory().getConnection().flushAll();
+	}
+	
+	
+	public String converTime(Long unixTime) {
+		if (unixTime == null) {
+			return "";
+		}
+		Instant instant = Instant.ofEpochSecond(Long.valueOf(unixTime));
+
+		// Convert Instant to LocalDateTime in UTC
+		LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
+
+		// Format LocalDateTime to a specific pattern (optional)
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		String formattedDateTime = dateTime.format(formatter);
+
+		return formattedDateTime;
+
 	}
 }

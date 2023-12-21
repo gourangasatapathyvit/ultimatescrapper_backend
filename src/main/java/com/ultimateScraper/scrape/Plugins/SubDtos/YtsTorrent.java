@@ -8,10 +8,10 @@ public class YtsTorrent implements Serializable{
 	private String quality;
 	private String type;
 
-	private int seeds;
-	private int peers;
+	private Integer seeds;
+	private Integer peers;
 	private String size;
-	private long date_uploaded_unix;
+	private Long date_uploaded_unix;
 
 	public String getUrl() {
 		return url;
@@ -45,19 +45,19 @@ public class YtsTorrent implements Serializable{
 		this.type = type;
 	}
 
-	public int getSeeds() {
+	public Integer getSeeds() {
 		return seeds;
 	}
 
-	public void setSeeds(int seeds) {
+	public void setSeeds(Integer seeds) {
 		this.seeds = seeds;
 	}
 
-	public int getPeers() {
+	public Integer getPeers() {
 		return peers;
 	}
 
-	public void setPeers(int peers) {
+	public void setPeers(Integer peers) {
 		this.peers = peers;
 	}
 
@@ -69,11 +69,11 @@ public class YtsTorrent implements Serializable{
 		this.size = size;
 	}
 
-	public long getDate_uploaded_unix() {
+	public Long getDate_uploaded_unix() {
 		return date_uploaded_unix;
 	}
 
-	public void setDate_uploaded_unix(long date_uploaded_unix) {
+	public void setDate_uploaded_unix(Long date_uploaded_unix) {
 		this.date_uploaded_unix = date_uploaded_unix;
 	}
 
