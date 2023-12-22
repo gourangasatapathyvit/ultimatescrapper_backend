@@ -16,7 +16,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler(Exception.class)
 	public final ResponseEntity<ErrorDetails> handleAllException(Exception ex, WebRequest request) throws Exception {
-		System.out.println("exception hit");
 		ErrorDetails details = new ErrorDetails(LocalDate.now(), ex.getMessage(), request.getDescription(false), HttpStatus.INTERNAL_SERVER_ERROR.value());
 
 		return new ResponseEntity<ErrorDetails>(details, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -25,7 +24,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(FilterContent.class)
 	public final ResponseEntity<ErrorDetails> handleUserNotFoundException(Exception ex, WebRequest request)
 			throws Exception {
-		System.out.println("filter hit");
 		ErrorDetails details = new ErrorDetails(LocalDate.now(), ex.getMessage(), request.getDescription(false),HttpStatus.FORBIDDEN.value());
 
 		return new ResponseEntity<ErrorDetails>(details, HttpStatus.FORBIDDEN);
