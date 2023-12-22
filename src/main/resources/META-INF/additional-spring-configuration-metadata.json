@@ -18,5 +18,10 @@
     "name": "auto.refresh.intervalInMillis",
     "type": "java.lang.String",
     "description": "time duration for flushing redish database"
+  },
+  {
+    "name": "filter.content",
+    "type": "java.lang.String",
+    "description": "filter Explicit content"
   }
 ]}

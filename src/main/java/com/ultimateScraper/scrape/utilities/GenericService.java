@@ -1,10 +1,17 @@
 package com.ultimateScraper.scrape.utilities;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,8 +55,7 @@ public class GenericService {
 		System.out.println("lorem1");
 		redisTemplate.getConnectionFactory().getConnection().flushAll();
 	}
-	
-	
+
 	public String converTime(Long unixTime) {
 		if (unixTime == null) {
 			return "";
@@ -64,6 +70,28 @@ public class GenericService {
 		String formattedDateTime = dateTime.format(formatter);
 
 		return formattedDateTime;
+
+	}
+
+	public Boolean readTextFile(String inputQuery) {
+
+		
+
+		try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/blocklist.txt"))) {
+			String word;
+			while ((word = br.readLine()) != null) {
+				String escapedString = Pattern.quote(word);
+				Pattern pattern = Pattern.compile("\\b" + escapedString + "\\b", Pattern.CASE_INSENSITIVE);
+				
+				if (pattern.matcher(inputQuery).find()) {
+					return true; // Found a match, return true
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 
 	}
 }

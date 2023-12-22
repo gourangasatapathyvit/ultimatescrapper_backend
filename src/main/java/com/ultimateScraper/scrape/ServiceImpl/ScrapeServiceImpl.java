@@ -43,6 +43,7 @@ import com.ultimateScraper.scrape.dto.ReqDto;
 import com.ultimateScraper.scrape.dto.RequestBodyParam;
 import com.ultimateScraper.scrape.dto.Yts;
 import com.ultimateScraper.scrape.utilities.RateLimitFilter;
+import com.ultimateScraper.scrape.utilities.FilterContent;
 import com.ultimateScraper.scrape.utilities.GenericService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,6 +64,9 @@ public class ScrapeServiceImpl implements ScrapeService {
 	@Value("${external.api.pirateBay.url}")
 	private String pirateBayUrl;
 
+	@Value("${filter.content}")
+	private String filterContent;
+
 	private RestTemplate restTemplate;
 	private GenericService genericService;
 
@@ -74,7 +78,6 @@ public class ScrapeServiceImpl implements ScrapeService {
 
 	@Override
 	public String test() {
-		// TODO Auto-generated method stub
 		return "lorem";
 	}
 
@@ -82,6 +85,10 @@ public class ScrapeServiceImpl implements ScrapeService {
 	@Async("taskExecutor")
 	@Cacheable(value = "getAllRes", key = "#searchTerm.inputQuery")
 	public CompletableFuture<List<GenericApiResp>> getAllRes(RequestBodyParam searchTerm) {
+		if (genericService.readTextFile(searchTerm.getInputQuery())) {
+	        return CompletableFuture.failedFuture(new FilterContent(filterContent));
+		}
+
 		CompletableFuture<List<GenericApiResp>> ytsObj = new CompletableFuture<>();
 		CompletableFuture<List<GenericApiResp>> pirateBayObj = new CompletableFuture<>();
 
@@ -118,30 +125,36 @@ public class ScrapeServiceImpl implements ScrapeService {
 			try {
 				List<PirateBay> response = mapper.readValue(responseBody, new TypeReference<List<PirateBay>>() {
 				});
+				if (response != null) {
+					for (PirateBay val : response) {
+						GenericApiResp apiResp = new GenericApiResp();
+						
+						if (genericService.readTextFile(val.getName())) {
+							continue;
+						}
+						apiResp.setName(val.getName());
 
-				for (PirateBay val : response) {
-					GenericApiResp apiResp = new GenericApiResp();
-					apiResp.setName(val.getName());
+						String magnetLink = !val.getInfo_hash().isEmpty() ? "magnet:?xt=urn:btih:" + val.getInfo_hash()
+								: "magnet:?xt=urn:btih:";
+						apiResp.setMagnetLink(magnetLink);
 
-					String magnetLink = !val.getInfo_hash().isEmpty() ? "magnet:?xt=urn:btih:" + val.getInfo_hash()
-							: "magnet:?xt=urn:btih:";
-					apiResp.setMagnetLink(magnetLink);
+						double sizeInGB = (double) Long.parseLong(val.getSize()) / (1024 * 1024 * 1024);
+						String formattedSize = df.format(sizeInGB);
+						apiResp.setSize(formattedSize + " " + "GB");
 
-					double sizeInGB = (double) Long.parseLong(val.getSize()) / (1024 * 1024 * 1024);
-					String formattedSize = df.format(sizeInGB);
-					apiResp.setSize(formattedSize + " " + "GB");
+						apiResp.setSeed(!val.getSeeders().isEmpty() ? Integer.valueOf(val.getSeeders()) : 0);
+						apiResp.setLeech(!val.getLeechers().isEmpty() ? Integer.valueOf(val.getLeechers()) : 0);
+						apiResp.setUploader(PIRATEBAY);
+						apiResp.setDownLoadLink("");
 
-					apiResp.setSeed(!val.getSeeders().isEmpty() ? Integer.valueOf(val.getSeeders()) : 0);
-					apiResp.setLeech(!val.getLeechers().isEmpty() ? Integer.valueOf(val.getLeechers()) : 0);
-					apiResp.setUploader(PIRATEBAY);
-					apiResp.setDownLoadLink("");
+						apiResp.setDate(genericService
+								.converTime(!val.getAdded().isEmpty() ? Long.valueOf(val.getAdded()) : null));
 
-					apiResp.setDate(
-							genericService.converTime(!val.getAdded().isEmpty() ? Long.valueOf(val.getAdded()) : null));
+						// pending - as we have imdb id, fetch image link from IMDB
+						apiResp.setImage("");
+						allDatas.add(apiResp);
+					}
 
-					// pending - as we have imdb id, fetch image link from IMDB
-					apiResp.setImage("");
-					allDatas.add(apiResp);
 				}
 
 			} catch (JsonProcessingException e) {
@@ -154,6 +167,7 @@ public class ScrapeServiceImpl implements ScrapeService {
 	}
 
 	@Override
+	@Cacheable(value = "getYtsRes", key = "#input")
 	public CompletableFuture<List<GenericApiResp>> getYtsRes(String input) {
 
 		return CompletableFuture.supplyAsync(() -> {
@@ -161,9 +175,9 @@ public class ScrapeServiceImpl implements ScrapeService {
 
 			Yts response = restTemplate.getForObject(YtsUrl + input, Yts.class);
 
-			if (response != null) {
-				List<YtsMovie> data = response.getData().getMovies();
+			List<YtsMovie> data = response.getData().getMovies();
 
+			if (data != null) {
 				for (YtsMovie val : data) {
 					GenericApiResp apiResp = new GenericApiResp();
 					apiResp.setName(val.getTitle_english());
@@ -185,6 +199,7 @@ public class ScrapeServiceImpl implements ScrapeService {
 					apiResp.setImage(val.getLarge_cover_image());
 					allDatas.add(apiResp);
 				}
+
 			}
 
 			return allDatas;
