@@ -19,24 +19,8 @@ import org.springframework.web.client.RestTemplate;
 @EnableCaching
 public class AppConfig {
 
-//	@Value("${proxy.host}")
-//	private String proxyHost;
-//
-//	@Value("${proxy.port}")
-//	private int proxyPort;
-
 	@Bean
 	public RestTemplate restTemplate() {
-
-//		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-//
-//		// Set proxy settings
-//		if (proxyHost != null && !proxyHost.isEmpty()) {
-//			requestFactory.setProxy(
-//					new java.net.Proxy(java.net.Proxy.Type.HTTP, new java.net.InetSocketAddress(proxyHost, proxyPort)));
-//		}
-//
-//		return new RestTemplate(requestFactory);
 		return new RestTemplate();
 	}
 

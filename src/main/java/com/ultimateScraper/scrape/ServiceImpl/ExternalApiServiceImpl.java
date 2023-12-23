@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -44,6 +45,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	}
 
 	@Override
+	@Async("taskExecutor")
 	@Cacheable(value = "getPirateBayRes", key = "#input")
 	public CompletableFuture<List<GenericApiResp>> getPirateBayRes(String input) {
 		return CompletableFuture.supplyAsync(() -> {
@@ -99,6 +101,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	}
 
 	@Override
+	@Async("taskExecutor")
 	@Cacheable(value = "getYtsRes", key = "#input")
 	public CompletableFuture<List<GenericApiResp>> getYtsRes(String input) {
 
