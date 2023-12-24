@@ -74,9 +74,7 @@ public class GenericService {
 	}
 
 	public Boolean readTextFile(String inputQuery) {
-
 		
-
 		try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/blocklist.txt"))) {
 			String word;
 			while ((word = br.readLine()) != null) {
@@ -84,7 +82,7 @@ public class GenericService {
 				Pattern pattern = Pattern.compile("\\b" + escapedString + "\\b", Pattern.CASE_INSENSITIVE);
 				
 				if (pattern.matcher(inputQuery).find()) {
-					return true; // Found a match, return true
+					return true; 
 				}
 
 			}

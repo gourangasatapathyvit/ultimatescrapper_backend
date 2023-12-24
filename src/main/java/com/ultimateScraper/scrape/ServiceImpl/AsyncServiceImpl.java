@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -37,30 +38,30 @@ public class AsyncServiceImpl implements AsyncService {
 			return CompletableFuture.failedFuture(new FilterContent(filterContent));
 		}
 
-		CompletableFuture<List<GenericApiResp>> ytsObj = CompletableFuture.completedFuture(new ArrayList<>());
-		CompletableFuture<List<GenericApiResp>> pirateBayObj = CompletableFuture.completedFuture(new ArrayList<>());
+		List<CompletableFuture<List<GenericApiResp>>> apiCalls = new ArrayList<>();
 
 		for (String val : searchTerm.getSource()) {
-			if (val.equalsIgnoreCase("yts")) {
-				ytsObj = externalApiService.getYtsRes(searchTerm.getInputQuery()).exceptionally(ex -> {
-					return Collections.emptyList(); //
+			CompletableFuture<List<GenericApiResp>> apiCall = getApiCall(searchTerm.getInputQuery(), val);
 
-				});
-			}
+			apiCalls.add(apiCall.exceptionally(ex -> {
+				return Collections.emptyList();
+			}));
 
-			if (val.toLowerCase().equals("piratebay")) {
-				pirateBayObj = externalApiService.getPirateBayRes(searchTerm.getInputQuery()).exceptionally(ex -> {
-					return Collections.emptyList(); //
-				});
-			}
 		}
+		CompletableFuture<Void> allOf = CompletableFuture.allOf(apiCalls.toArray(new CompletableFuture[0]));
 
-		return ytsObj.thenCombine(pirateBayObj, (ytsRes, pirateBayRes) -> {
-			List<GenericApiResp> combinedResults = new ArrayList<>();
-			combinedResults.addAll(ytsRes);
-			combinedResults.addAll(pirateBayRes);
-			return combinedResults;
-		});
+		return allOf.thenApply(
+				v -> apiCalls.stream().map(CompletableFuture::join).flatMap(List::stream).collect(Collectors.toList()));
+	}
+
+	private CompletableFuture<List<GenericApiResp>> getApiCall(String inputQuery, String apiName) {
+		if (apiName.equalsIgnoreCase("yts")) {
+			return externalApiService.getYtsRes(inputQuery);
+		} else if (apiName.equalsIgnoreCase("piratebay")) {
+			return externalApiService.getPirateBayRes(inputQuery);
+		}
+		// Add conditions for other APIs  in the future
+		return CompletableFuture.completedFuture(Collections.emptyList());
 	}
 
 }
