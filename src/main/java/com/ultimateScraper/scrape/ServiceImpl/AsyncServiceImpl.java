@@ -1,6 +1,7 @@
 package com.ultimateScraper.scrape.ServiceImpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,11 +42,16 @@ public class AsyncServiceImpl implements AsyncService {
 
 		for (String val : searchTerm.getSource()) {
 			if (val.equalsIgnoreCase("yts")) {
-				ytsObj = externalApiService.getYtsRes(searchTerm.getInputQuery());
+				ytsObj = externalApiService.getYtsRes(searchTerm.getInputQuery()).exceptionally(ex -> {
+					return Collections.emptyList(); //
+
+				});
 			}
 
 			if (val.toLowerCase().equals("piratebay")) {
-				pirateBayObj = externalApiService.getPirateBayRes(searchTerm.getInputQuery());
+				pirateBayObj = externalApiService.getPirateBayRes(searchTerm.getInputQuery()).exceptionally(ex -> {
+					return Collections.emptyList(); //
+				});
 			}
 		}
 

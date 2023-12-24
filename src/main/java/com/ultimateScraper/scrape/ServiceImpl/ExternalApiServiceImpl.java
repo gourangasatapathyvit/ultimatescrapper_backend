@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,16 +27,16 @@ import com.ultimateScraper.scrape.utilities.GenericService;
 
 @Service
 public class ExternalApiServiceImpl implements ExternalApiService {
-	
+
 	private final static String YTS = "YTS";
 	private final static String PIRATEBAY = "Pirate Bay";
-	
+
 	@Value("${external.api.yts.url}")
 	private String YtsUrl;
 
 	@Value("${external.api.pirateBay.url}")
 	private String pirateBayUrl;
-	
+
 	private RestTemplate restTemplate;
 	private GenericService genericService;
 
@@ -63,9 +64,9 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 					for (PirateBay val : response) {
 						GenericApiResp apiResp = new GenericApiResp();
 
-//						if (genericService.readTextFile(val.getName())) {
-//							continue;
-//						}
+						if (genericService.readTextFile(val.getName())) {
+							continue;
+						}
 						apiResp.setName(val.getName());
 
 						String magnetLink = !val.getInfo_hash().isEmpty() ? "magnet:?xt=urn:btih:" + val.getInfo_hash()
@@ -91,10 +92,10 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 
 				}
 
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
 				return Collections.emptyList();
 			}
+
 			return allDatas;
 
 		});
@@ -108,36 +109,44 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 		return CompletableFuture.supplyAsync(() -> {
 			List<GenericApiResp> allDatas = new ArrayList<>();
 
-			Yts response = restTemplate.getForObject(YtsUrl + input, Yts.class);
+			try {
 
-			List<YtsMovie> data = response.getData().getMovies();
+				Yts response = restTemplate.getForObject(YtsUrl + input, Yts.class);
 
-			if (data != null) {
-				for (YtsMovie val : data) {
-					GenericApiResp apiResp = new GenericApiResp();
-					apiResp.setName(val.getTitle_english());
+				List<YtsMovie> data = response.getData().getMovies();
 
-					String magnetLink = !val.getTorrents().isEmpty()
-							? "magnet:?xt=urn:btih:" + val.getTorrents().get(0).getHash()
-							: "magnet:?xt=urn:btih:";
+				if (data != null) {
+					for (YtsMovie val : data) {
+						GenericApiResp apiResp = new GenericApiResp();
+						apiResp.setName(val.getTitle_english());
 
-					// Pending: Logic for getting all torrents and showing in dropdown design
+						String magnetLink = !val.getTorrents().isEmpty()
+								? "magnet:?xt=urn:btih:" + val.getTorrents().get(0).getHash()
+								: "magnet:?xt=urn:btih:";
 
-					apiResp.setMagnetLink(magnetLink);
-					apiResp.setSize(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getSize() : "0");
-					apiResp.setSeed(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getSeeds() : 0);
-					apiResp.setLeech(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getPeers() : 0);
-					apiResp.setUploader(YTS);
-					apiResp.setDownLoadLink(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getUrl() : "");
-					apiResp.setDate(genericService.converTime(
-							!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getDate_uploaded_unix() : null));
-					apiResp.setImage(val.getLarge_cover_image());
-					allDatas.add(apiResp);
+						// Pending: Logic for getting all torrents and showing in dropdown design
+
+						apiResp.setMagnetLink(magnetLink);
+						apiResp.setSize(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getSize() : "0");
+						apiResp.setSeed(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getSeeds() : 0);
+						apiResp.setLeech(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getPeers() : 0);
+						apiResp.setUploader(YTS);
+						apiResp.setDownLoadLink(!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getUrl() : "");
+						apiResp.setDate(genericService.converTime(
+								!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getDate_uploaded_unix()
+										: null));
+						apiResp.setImage(val.getLarge_cover_image());
+						allDatas.add(apiResp);
+					}
+
 				}
 
+				return allDatas;
+
+			} catch (Exception e) {
+				return Collections.emptyList();
 			}
 
-			return allDatas;
 		});
 	}
 

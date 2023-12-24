@@ -1,5 +1,6 @@
 package com.ultimateScraper.scrape;
 
+import java.net.http.HttpClient;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
@@ -19,10 +21,15 @@ import org.springframework.web.client.RestTemplate;
 @EnableCaching
 public class AppConfig {
 
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+
+	  @Bean
+	    public RestTemplate restTemplate() {
+	        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+	        requestFactory.setConnectTimeout(5000); // 5 seconds connection timeout
+	        requestFactory.setReadTimeout(5000); // 5 seconds socket timeout
+
+	        return new RestTemplate(requestFactory);
+	    }
 
 	@Bean
 	public RedisTemplate<String, Integer> redisTemplate(RedisConnectionFactory connectionFactory) {
