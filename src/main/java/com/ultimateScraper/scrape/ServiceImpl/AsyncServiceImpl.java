@@ -31,37 +31,55 @@ public class AsyncServiceImpl implements AsyncService {
 		this.externalApiService = externalApiService;
 	}
 
+	/*
+	 * @Override public CompletableFuture<List<GenericApiResp>>
+	 * invokeGetAllRes(RequestBodyParam searchTerm) { if
+	 * (genericService.readTextFile(searchTerm.getInputQuery())) { return
+	 * CompletableFuture.failedFuture(new FilterContent(filterContent)); }
+	 * 
+	 * List<CompletableFuture<List<GenericApiResp>>> apiCalls = new ArrayList<>();
+	 * 
+	 * for (String val : searchTerm.getSource()) {
+	 * CompletableFuture<List<GenericApiResp>> apiCall =
+	 * getApiCall(searchTerm.getInputQuery(), val);
+	 * 
+	 * apiCalls.add(apiCall.exceptionally(ex -> { return Collections.emptyList();
+	 * }));
+	 * 
+	 * } CompletableFuture<Void> allOf =
+	 * CompletableFuture.allOf(apiCalls.toArray(new CompletableFuture[0]));
+	 * 
+	 * return allOf.thenApply( v ->
+	 * apiCalls.stream().map(CompletableFuture::join).flatMap(List::stream).collect(
+	 * Collectors.toList())); }
+	 */
+	
 	@Override
-	@Async("taskExecutor")
-	public CompletableFuture<List<GenericApiResp>> invokeGetAllRes(RequestBodyParam searchTerm) {
+	public List<GenericApiResp> invokeGetAllRes(RequestBodyParam searchTerm) {
 		if (genericService.readTextFile(searchTerm.getInputQuery())) {
-			return CompletableFuture.failedFuture(new FilterContent(filterContent));
+			 throw new FilterContent(filterContent);
 		}
 
-		List<CompletableFuture<List<GenericApiResp>>> apiCalls = new ArrayList<>();
+		List<List<GenericApiResp>> apiCalls = new ArrayList<>();
 
 		for (String val : searchTerm.getSource()) {
-			CompletableFuture<List<GenericApiResp>> apiCall = getApiCall(searchTerm.getInputQuery(), val);
-
-			apiCalls.add(apiCall.exceptionally(ex -> {
-				return Collections.emptyList();
-			}));
+			List<GenericApiResp> apiCall = getApiCall(searchTerm.getInputQuery(), val);
+			apiCalls.add(apiCall);
 
 		}
-		CompletableFuture<Void> allOf = CompletableFuture.allOf(apiCalls.toArray(new CompletableFuture[0]));
 
-		return allOf.thenApply(
-				v -> apiCalls.stream().map(CompletableFuture::join).flatMap(List::stream).collect(Collectors.toList()));
+		return apiCalls.stream().map(e->e).flatMap(List::stream).collect(Collectors.toList());
 	}
 
-	private CompletableFuture<List<GenericApiResp>> getApiCall(String inputQuery, String apiName) {
+	private List<GenericApiResp> getApiCall(String inputQuery, String apiName) {
 		if (apiName.equalsIgnoreCase("yts")) {
-			return externalApiService.getYtsRes(inputQuery);
-		} else if (apiName.equalsIgnoreCase("piratebay")) {
-			return externalApiService.getPirateBayRes(inputQuery);
+			return externalApiService.getCachedYtsRes(inputQuery);
+		}
+		else if (apiName.equalsIgnoreCase("piratebay")) {
+			return externalApiService.getCachedpirateBayRes(inputQuery);
 		}
 		// Add conditions for other APIs  in the future
-		return CompletableFuture.completedFuture(Collections.emptyList());
+		return Collections.emptyList();
 	}
 
 }

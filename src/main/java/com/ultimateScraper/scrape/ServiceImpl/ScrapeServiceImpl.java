@@ -28,9 +28,16 @@ public class ScrapeServiceImpl implements ScrapeService {
 		return "lorem";
 	}
 
-	public CompletableFuture<List<GenericApiResp>> getAllRes(RequestBodyParam searchTerm) {
-		return asyncService.invokeGetAllRes(searchTerm);
+	/*
+	 * public CompletableFuture<List<GenericApiResp>> getAllRes(RequestBodyParam
+	 * searchTerm) { return asyncService.invokeGetAllRes(searchTerm);
+	 * 
+	 * }
+	 */
 
+	public List<GenericApiResp> getAllRes(RequestBodyParam searchTerm) {
+		return asyncService.invokeGetAllRes(searchTerm);
+		
 	}
 
 }

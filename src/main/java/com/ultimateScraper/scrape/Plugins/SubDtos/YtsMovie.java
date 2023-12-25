@@ -3,7 +3,9 @@ package com.ultimateScraper.scrape.Plugins.SubDtos;
 import java.io.Serializable;
 import java.util.List;
 
-public class YtsMovie implements Serializable{
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+
+public class YtsMovie extends JdkSerializationRedisSerializer implements Serializable{
 	private int id;
 	private String url;
 	private String imdb_code;

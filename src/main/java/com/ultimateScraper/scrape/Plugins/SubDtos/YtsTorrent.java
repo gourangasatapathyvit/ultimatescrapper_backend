@@ -2,7 +2,9 @@ package com.ultimateScraper.scrape.Plugins.SubDtos;
 
 import java.io.Serializable;
 
-public class YtsTorrent implements Serializable{
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+
+public class YtsTorrent extends JdkSerializationRedisSerializer implements Serializable{
 	private String url;
 	private String hash;
 	private String quality;

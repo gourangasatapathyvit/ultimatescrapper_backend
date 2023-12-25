@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 @EnableScheduling
 public class GenericService {
 
-	@Value("${resilience4j.ratelimiter.configs.getAllRes.limit-for-period}")
+	@Value("${ratelimiter.limit-for-period}")
 	private String limitForPeriod;
 
 	private final RedisTemplate<String, Integer> redisTemplate;
@@ -45,7 +45,7 @@ public class GenericService {
 			redisTemplate.expire(key, 1, TimeUnit.MINUTES);
 		}
 
-		return count != null && count > Long.valueOf(limitForPeriod); // Limit to 5 requests per minute
+		return count != null && count > Long.valueOf(limitForPeriod);
 	}
 
 	@SuppressWarnings("deprecation")

@@ -2,7 +2,9 @@ package com.ultimateScraper.scrape.dto;
 
 import java.io.Serializable;
 
-public class GenericApiResp implements Serializable {
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+
+public class GenericApiResp extends JdkSerializationRedisSerializer implements Serializable {
 	private String name;
 	private String magnetLink;
 	private String size;

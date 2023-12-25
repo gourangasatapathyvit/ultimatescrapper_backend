@@ -3,6 +3,15 @@ package com.ultimateScraper.scrape.utilities;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -10,16 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
-@Component
 public class RateLimitFilter implements Filter {
 
 	private final RedisTemplate<String, Integer> redisTemplate;
@@ -36,6 +36,7 @@ public class RateLimitFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
+		System.out.println("filter");
 
 		String ipAddress = httpRequest.getRemoteAddr(); // Get client's IP address
 		// Perform rate limiting logic here
@@ -63,6 +64,7 @@ public class RateLimitFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) {
+		System.out.println("filter start");
 		// Initialization logic
 	}
 
@@ -70,5 +72,7 @@ public class RateLimitFilter implements Filter {
 	public void destroy() {
 		// Cleanup logic
 	}
+
+
 
 }

@@ -1,6 +1,5 @@
 package com.ultimateScraper.scrape.dto;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ReqDto {

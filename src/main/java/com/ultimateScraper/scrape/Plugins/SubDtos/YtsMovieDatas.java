@@ -3,7 +3,7 @@ package com.ultimateScraper.scrape.Plugins.SubDtos;
 import java.io.Serializable;
 import java.util.List;
 
-public class YtsMovieDatas implements Serializable{
+public class YtsMovieDatas{
 	private int movie_count;
 	private int page_number;
 	private List<YtsMovie> movies;
