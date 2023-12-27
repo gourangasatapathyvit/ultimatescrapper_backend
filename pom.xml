@@ -48,6 +48,12 @@
 <!--		</dependency>-->
 
 		<dependency>
+			<groupId>org.example</groupId>
+			<artifactId>custModule</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
@@ -76,19 +82,22 @@
 			<version>5.0.0</version><!--$NO-MVN-MAN-VER$-->
 			<scope>provided</scope>
 		</dependency>
-		
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.ultimateScrape.serviceRegistry</groupId>
-			<artifactId>serviceRegistry</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>github-repo-module</id>
+			<name>modules Repository</name>
+			<url>https://github.com/gourangasatapathyvit/scrapemodule/tree/main/</url>
+		</repository>
+	</repositories>
 	
 	<dependencyManagement>
 		<dependencies>
