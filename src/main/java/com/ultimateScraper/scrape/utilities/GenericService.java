@@ -1,18 +1,7 @@
 package com.ultimateScraper.scrape.utilities;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,9 +10,20 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
 @Service
 @EnableScheduling
 public class GenericService {
+
+	private static final Logger logger = LogManager.getLogger(GenericService.class);
 
 	@Value("${ratelimiter.limit-for-period}")
 	private String limitForPeriod;
@@ -45,14 +45,14 @@ public class GenericService {
 			redisTemplate.expire(key, 1, TimeUnit.MINUTES);
 		}
 
-		return count != null && count > Long.valueOf(limitForPeriod);
+		return count != null && count > Long.parseLong(limitForPeriod);
 	}
 
 	@SuppressWarnings("deprecation")
 	@CacheEvict(allEntries = true, value = { "getYtsResp" })
 	@Scheduled(fixedRateString = "${auto.refresh.intervalInMillis}")
 	public void evictAllCacheValues() {
-		System.out.println("lorem1");
+		logger.info("{}","lorem CacheEvict");
 		redisTemplate.getConnectionFactory().getConnection().flushAll();
 	}
 
@@ -60,16 +60,15 @@ public class GenericService {
 		if (unixTime == null) {
 			return "";
 		}
-		Instant instant = Instant.ofEpochSecond(Long.valueOf(unixTime));
+		Instant instant = Instant.ofEpochSecond(unixTime);
 
 		// Convert Instant to LocalDateTime in UTC
 		LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
 
 		// Format LocalDateTime to a specific pattern (optional)
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		String formattedDateTime = dateTime.format(formatter);
 
-		return formattedDateTime;
+        return dateTime.format(formatter);
 
 	}
 

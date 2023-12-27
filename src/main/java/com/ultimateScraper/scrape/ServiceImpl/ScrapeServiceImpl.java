@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ultimateScraper.scrape.Services.AsyncService;
@@ -16,8 +17,9 @@ import com.ultimateScraper.scrape.dto.RequestBodyParam;
 @RestController
 @EnableCaching
 @CrossOrigin(origins = "http://localhost:8080")
+@RequestMapping("/scrape")
 public class ScrapeServiceImpl implements ScrapeService {
-	private AsyncService asyncService;
+	private final AsyncService asyncService;
 
 	public ScrapeServiceImpl(AsyncService asyncService) {
 		this.asyncService = asyncService;

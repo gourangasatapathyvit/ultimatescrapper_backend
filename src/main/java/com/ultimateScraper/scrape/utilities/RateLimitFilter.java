@@ -1,20 +1,14 @@
 package com.ultimateScraper.scrape.utilities;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 public class RateLimitFilter implements Filter {
@@ -33,8 +27,6 @@ public class RateLimitFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		System.out.println("filter");
-
 		String ipAddress = httpRequest.getRemoteAddr(); // Get client's IP address
 		// Perform rate limiting logic here
 		if (rateLimiterService.exceedsRateLimit(ipAddress)) {
@@ -61,7 +53,6 @@ public class RateLimitFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) {
-		System.out.println("filter start");
 		// Initialization logic
 	}
 

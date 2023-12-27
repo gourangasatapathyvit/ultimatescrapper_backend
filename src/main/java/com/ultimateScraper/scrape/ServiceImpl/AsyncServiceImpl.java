@@ -23,8 +23,8 @@ public class AsyncServiceImpl implements AsyncService {
 	@Value("${filter.content}")
 	private String filterContent;
 
-	private GenericService genericService;
-	private ExternalApiService externalApiService;
+	private final GenericService genericService;
+	private final ExternalApiService externalApiService;
 
 	public AsyncServiceImpl(GenericService genericService, ExternalApiService externalApiService) {
 		this.genericService = genericService;

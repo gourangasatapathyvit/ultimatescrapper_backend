@@ -37,8 +37,8 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	@Value("${external.api.pirateBay.url}")
 	private String pirateBayUrl;
 
-	private RestTemplate restTemplate;
-	private GenericService genericService;
+	private final RestTemplate restTemplate;
+	private final GenericService genericService;
 
 	public ExternalApiServiceImpl(RestTemplate restTemplate, GenericService genericService) {
 		this.restTemplate = restTemplate;
@@ -147,13 +147,12 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 
 	@Cacheable(value = "getYtsRes", key = "#input")
 	public List<GenericApiResp> getCachedYtsRes(String input) {
-//		we need to reutrn List<GenericApiResp>  instead CompletableFuture<List<GenericApiResp>> as serialize issue in redis in springboot at 2.7.5
+//		we need to return List<GenericApiResp>  instead CompletableFuture<List<GenericApiResp>> as serialize issue in redis in springboot at 2.7.5
 
 		try {
 			CompletableFuture<List<GenericApiResp>> completableFuture = getYtsResAsync(input);
 			return completableFuture.get(); // Wait for completion and return result
 		} catch (Exception e) {
-			e.printStackTrace();
 			return Collections.emptyList();
 		}
 
@@ -161,13 +160,12 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 
 	@Cacheable(value = "getPirateBayRes", key = "#input")
 	public List<GenericApiResp> getCachedpirateBayRes(String input) {
-//		we need to reutrn List<GenericApiResp>  instead CompletableFuture<List<GenericApiResp>> as serialize issue in redis in java at 2.7.5
+//		we need to return List<GenericApiResp>  instead CompletableFuture<List<GenericApiResp>> as serialize issue in redis in java at 2.7.5
 
 		try {
 			CompletableFuture<List<GenericApiResp>> completableFuture = getpirateBayResAsync(input);
 			return completableFuture.get(); // Wait for completion and return result
 		} catch (Exception e) {
-			e.printStackTrace();
 			return Collections.emptyList();
 		}
 
@@ -217,7 +215,6 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 
 			return allDatas;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return Collections.emptyList();
 		}
 	}
