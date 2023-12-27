@@ -247,8 +247,8 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 					String formattedSize = df.format(sizeInGB);
 					apiResp.setSize(formattedSize + " " + "GB");
 
-					apiResp.setSeed(!val.getSeeders().isEmpty() ? Integer.valueOf(val.getSeeders()) : 0);
-					apiResp.setLeech(!val.getLeechers().isEmpty() ? Integer.valueOf(val.getLeechers()) : 0);
+					apiResp.setSeed(!val.getSeeders().isEmpty() ? Integer.parseInt(val.getSeeders()) : 0);
+					apiResp.setLeech(!val.getLeechers().isEmpty() ? Integer.parseInt(val.getLeechers()) : 0);
 					apiResp.setUploader(PIRATEBAY);
 					apiResp.setDownLoadLink("");
 
