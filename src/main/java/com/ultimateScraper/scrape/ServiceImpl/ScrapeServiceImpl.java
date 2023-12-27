@@ -15,7 +15,6 @@ import com.ultimateScraper.scrape.dto.RequestBodyParam;
 
 @RestController
 @EnableCaching
-@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("/scrape")
 public class ScrapeServiceImpl implements ScrapeService {
 	private final AsyncService asyncService;

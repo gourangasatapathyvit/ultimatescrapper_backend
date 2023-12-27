@@ -13,11 +13,16 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableAsync
 @EnableCaching
-public class AppConfig {
+public class AppConfig{
 
 	@Bean
 	public RestTemplate restTemplate() {
@@ -59,6 +64,20 @@ public class AppConfig {
 	    registrationBean.setOrder(1); // Set the filter order, if we have multiple filter prioritize
 
 	    return registrationBean;
+	}
+
+	@Bean
+	public CorsWebFilter corsWebFilter() {
+		CorsConfiguration corsConfig = new CorsConfiguration();
+		corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+		corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		corsConfig.setMaxAge(3600L);
+		corsConfig.addAllowedHeader("*");
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfig);
+
+		return new CorsWebFilter(source);
 	}
 	
 }
