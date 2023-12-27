@@ -1,8 +1,7 @@
 package com.ultimateScraper.scrape;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import com.ultimateScraper.scrape.utilities.GenericService;
+import com.ultimateScraper.scrape.utilities.RateLimitFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +13,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
-
-import com.netflix.discovery.DiscoveryClient;
-import com.ultimateScraper.scrape.utilities.GenericService;
-import com.ultimateScraper.scrape.utilities.RateLimitFilter;
 
 @Configuration
 @EnableAsync
