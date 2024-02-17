@@ -11,5 +11,6 @@ public interface ExternalApiService {
 //	CompletableFuture<List<GenericApiResp>> getYtsRes(String input);
 	List<GenericApiResp> getCachedYtsRes(String input);
 	List<GenericApiResp> getCachedpirateBayRes(String input);
+	List<GenericApiResp> getCachedSnowFlRes(String input);
 
 }

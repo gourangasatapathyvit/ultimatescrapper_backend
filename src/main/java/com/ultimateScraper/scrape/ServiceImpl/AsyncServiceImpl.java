@@ -78,6 +78,9 @@ public class AsyncServiceImpl implements AsyncService {
 		else if (apiName.equalsIgnoreCase("piratebay")) {
 			return externalApiService.getCachedpirateBayRes(inputQuery);
 		}
+		else if (apiName.equalsIgnoreCase("snowfl")) {
+			return externalApiService.getCachedSnowFlRes(inputQuery);
+		}
 		// Add conditions for other APIs  in the future
 		return Collections.emptyList();
 	}

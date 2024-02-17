@@ -12,14 +12,10 @@ import java.util.concurrent.TimeUnit;
 
 
 public class RateLimitFilter implements Filter {
-
-	private final RedisTemplate<String, Integer> redisTemplate;
-	private final GenericService rateLimiterService;
-
+    private final GenericService rateLimiterService;
 	@Autowired
-	public RateLimitFilter(RedisTemplate<String, Integer> redisTemplate, GenericService rateLimiterService) {
-		this.redisTemplate = redisTemplate;
-		this.rateLimiterService = rateLimiterService;
+	public RateLimitFilter(GenericService rateLimiterService) {
+        this.rateLimiterService = rateLimiterService;
 	}
 
 	@Override
@@ -38,19 +34,6 @@ public class RateLimitFilter implements Filter {
 
 	}
 
-	public boolean exceedsRateLimit(String ipAddress) {
-		String key = "rate_limit:" + ipAddress;
-
-		Long count = redisTemplate.opsForValue().increment(key, 1); // Increment key by 1
-
-		if (count != null && count == 1) {
-			// Set expiration time if the key is newly created
-			redisTemplate.expire(key, 1, TimeUnit.MINUTES);
-		}
-
-		return count != null && count > 5; // Limit to 5 requests per minute
-	}
-
 	@Override
 	public void init(FilterConfig filterConfig) {
 		// Initialization logic
@@ -60,7 +43,4 @@ public class RateLimitFilter implements Filter {
 	public void destroy() {
 		// Cleanup logic
 	}
-
-
-
 }
