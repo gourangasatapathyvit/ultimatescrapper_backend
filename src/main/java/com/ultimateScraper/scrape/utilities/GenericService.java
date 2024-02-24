@@ -22,6 +22,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -51,11 +52,12 @@ public class GenericService {
 
 		return count != null && count > Long.parseLong(limitForPeriod);
 	}
-	@CacheEvict(allEntries = true, value = { "getYtsResp" })
+	@CacheEvict(allEntries = true, value = { "*" })
 	@Scheduled(fixedRateString = "${auto.refresh.intervalInMillis}")
 	public void evictAllCacheValues() {
+//		TODO - implement using api call (custom clear)
 		logger.info("{}","lorem CacheEvict");
-		redisTemplate.getConnectionFactory().getConnection().flushAll();
+		Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().flushAll();
 	}
 
 	public String converTime(Long unixTime) {
@@ -82,6 +84,7 @@ public class GenericService {
 				}
 			}
 		} catch (Exception e) {
+			logger.error("Error at: {} {}","readTextFile",e);
 			e.printStackTrace();
 		}
 		return false;
