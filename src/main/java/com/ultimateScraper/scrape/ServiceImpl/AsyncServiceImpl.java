@@ -1,11 +1,14 @@
 package com.ultimateScraper.scrape.ServiceImpl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import com.ultimateScraper.scrape.utilities.GenericService;
 
 @Service
 public class AsyncServiceImpl implements AsyncService {
+	private static final Logger logger = LogManager.getLogger(AsyncServiceImpl.class);
 
 	@Value("${filter.content}")
 	private String filterContent;
@@ -56,8 +60,14 @@ public class AsyncServiceImpl implements AsyncService {
 	
 	@Override
 	public List<GenericApiResp> invokeGetAllRes(RequestBodyParam searchTerm) {
-		if (genericService.readTextFile(searchTerm.getInputQuery())) {
-			 throw new FilterContent(filterContent);
+
+		try {
+			if (genericService.readTextFile(searchTerm.getInputQuery())) {
+				throw new FilterContent(filterContent);
+			}
+
+		} catch (IOException e) {
+			logger.error("Error at: {} {}", "invokeGetAllRes", e.getMessage());
 		}
 
 		List<List<GenericApiResp>> apiCalls = new ArrayList<>();

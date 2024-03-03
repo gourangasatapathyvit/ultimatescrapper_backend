@@ -12,10 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -23,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -72,24 +70,25 @@ public class GenericService {
         return dateTime.format(formatter);
 	}
 
-	public Boolean readTextFile(String inputQuery) {
-		try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/blocklist.txt"))) {
-			String word;
-			while ((word = br.readLine()) != null) {
-				String escapedString = Pattern.quote(word);
-				Pattern pattern = Pattern.compile("\\b" + escapedString + "\\b", Pattern.CASE_INSENSITIVE);
-				
+	public boolean readTextFile(String inputQuery) throws IOException {
+		try (InputStream is = getClass().getResourceAsStream("/blocklist.txt")) {
+			if (is == null) {
+				throw new IOException("blocklist.txt not found in resources directory");
+			}
+			// Use a Scanner to efficiently read the file line by line
+			Scanner scanner = new Scanner(is);
+			while (scanner.hasNextLine()) {
+				String word = scanner.nextLine();
+				String escapedWord = Pattern.quote(word);
+				Pattern pattern = Pattern.compile("\\b" + escapedWord + "\\b", Pattern.CASE_INSENSITIVE);
 				if (pattern.matcher(inputQuery).find()) {
-					return true; 
+					return true;
 				}
 			}
-		} catch (Exception e) {
-			logger.error("Error at: {} {}","readTextFile",e);
-			e.printStackTrace();
 		}
 		return false;
-
 	}
+
 	public String fetchURL(String urlString, List<Map.Entry<String, String>> headers) {
 		try {
 			HttpGet request = new HttpGet(urlString);
