@@ -59,7 +59,8 @@ public class AsyncServiceImpl implements AsyncService {
      */
 
     @Override
-    public List<GenericApiResp> invokeGetAllRes(RequestBodyParam searchTerm) {
+    @Async("taskExecutor")
+    public CompletableFuture<List<GenericApiResp>> invokeGetAllRes(RequestBodyParam searchTerm) {
 		List<CompletableFuture<List<GenericApiResp>>> apiCallFutures = new ArrayList<>();
 
 		try {
@@ -82,8 +83,7 @@ public class AsyncServiceImpl implements AsyncService {
                         apiCallFutures.stream()
                                 .map(CompletableFuture::join)
                                 .flatMap(List::stream)
-                                .collect(Collectors.toList()))
-                .join();
+                                .collect(Collectors.toList()));
     }
 
     private List<GenericApiResp> getApiCall(String inputQuery, String apiName) {

@@ -8,6 +8,6 @@ import com.ultimateScraper.scrape.dto.RequestBodyParam;
 
 public interface AsyncService {
 //	CompletableFuture<List<GenericApiResp>> invokeGetAllRes(RequestBodyParam searchTerm);
-	List<GenericApiResp> invokeGetAllRes(RequestBodyParam searchTerm);
+	CompletableFuture<List<GenericApiResp>> invokeGetAllRes(RequestBodyParam searchTerm);
 
 }

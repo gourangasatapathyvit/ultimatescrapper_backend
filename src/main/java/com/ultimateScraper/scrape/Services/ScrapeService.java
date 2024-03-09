@@ -19,7 +19,7 @@ public interface ScrapeService {
 //	public CompletableFuture<List<GenericApiResp>> getAllRes(@RequestBody RequestBodyParam searchTerm);
 
 	@PostMapping("/getAllRes")
-	public List<GenericApiResp> getAllRes(@RequestBody RequestBodyParam searchTerm);
+	public CompletableFuture<List<GenericApiResp>> getAllRes(@RequestBody RequestBodyParam searchTerm);
 
 
 }

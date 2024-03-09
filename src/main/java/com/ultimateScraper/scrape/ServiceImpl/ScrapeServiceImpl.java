@@ -35,7 +35,7 @@ public class ScrapeServiceImpl implements ScrapeService {
 	 * }
 	 */
 
-	public List<GenericApiResp> getAllRes(RequestBodyParam searchTerm) {
+	public CompletableFuture<List<GenericApiResp>> getAllRes(RequestBodyParam searchTerm) {
 		return asyncService.invokeGetAllRes(searchTerm);
 		
 	}
