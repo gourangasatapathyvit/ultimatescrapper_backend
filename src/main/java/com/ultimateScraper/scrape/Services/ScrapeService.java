@@ -13,13 +13,13 @@ import com.ultimateScraper.scrape.dto.RequestBodyParam;
 public interface ScrapeService {
 
 	@GetMapping("/test")
-	public String test();
+    String test();
 //
 //	@PostMapping("/getAllRes")
 //	public CompletableFuture<List<GenericApiResp>> getAllRes(@RequestBody RequestBodyParam searchTerm);
 
 	@PostMapping("/getAllRes")
-	public CompletableFuture<List<GenericApiResp>> getAllRes(@RequestBody RequestBodyParam searchTerm);
+    CompletableFuture<List<GenericApiResp>> getAllRes(@RequestBody RequestBodyParam searchTerm);
 
 
 }
