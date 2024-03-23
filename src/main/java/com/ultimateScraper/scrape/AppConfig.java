@@ -84,14 +84,14 @@ public class AppConfig {
         return executor;
     }
 
-    @Bean
-    public FilterRegistrationBean<RateLimitFilter> rateLimitFilter(GenericService rateLimiterService) {
-
-        FilterRegistrationBean<RateLimitFilter> registrationBean = new FilterRegistrationBean<>();
-        RateLimitFilter filter = new RateLimitFilter(rateLimiterService);
-        registrationBean.setFilter(filter);
-        registrationBean.addUrlPatterns("/*"); // Specify the URL patterns to match
-        registrationBean.setOrder(1); // Set the filter order, if we have multiple filter prioritize
-        return registrationBean;
-    }
+//    @Bean
+//    public FilterRegistrationBean<RateLimitFilter> rateLimitFilter(GenericService rateLimiterService) {
+//
+//        FilterRegistrationBean<RateLimitFilter> registrationBean = new FilterRegistrationBean<>();
+//        RateLimitFilter filter = new RateLimitFilter(rateLimiterService);
+//        registrationBean.setFilter(filter);
+//        registrationBean.addUrlPatterns("/*"); // Specify the URL patterns to match
+//        registrationBean.setOrder(1); // Set the filter order, if we have multiple filter prioritize
+//        return registrationBean;
+//    }
 }

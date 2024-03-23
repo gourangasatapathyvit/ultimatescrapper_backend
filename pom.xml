@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.ultimateScraper</groupId>
 	<artifactId>scrape</artifactId>
-	<version>1.1.13</version>
+	<version>1.1.14</version>
 	<name>scrape</name>
 	<description>Demo project for Spring Boot</description>
     <properties>
