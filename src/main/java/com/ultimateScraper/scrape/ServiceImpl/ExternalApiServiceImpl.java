@@ -51,6 +51,9 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	@Value("${external.api.pirateBay.url}")
 	private String pirateBayUrl;
 
+	@Value("${external.api.pirateBay.description}")
+	private String pirateBayDescription;
+
 	@Value("${external.api.snowFl.url}")
 	private String snowFlUrl;
 
@@ -198,17 +201,17 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 		}
 	}
 
-	@Async("taskExecutor")
+//	@Async("taskExecutor")
 	public CompletableFuture<List<GenericApiResp>> getYtsResAsync(String input) {
 		return CompletableFuture.supplyAsync(() -> fetchYtsData(input));
 	}
 
-	@Async("taskExecutor")
+//	@Async("taskExecutor")
 	public CompletableFuture<List<GenericApiResp>> getpirateBayResAsync(String input) {
 		return CompletableFuture.supplyAsync(() -> fetchpirateBayData(input));
 	}
 
-	@Async("taskExecutor")
+//	@Async("taskExecutor")
 	public CompletableFuture<List<GenericApiResp>> getSnowFlAsync(String input) {
 		return CompletableFuture.supplyAsync(() -> fetchSnowFlData(input));
 	}
@@ -251,7 +254,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	private List<GenericApiResp> fetchpirateBayData(String input) {
 		List<GenericApiResp> allDatas = new ArrayList<>();
 		DecimalFormat df = new DecimalFormat("#.##");
-		logger.info("baseurl generated for {} : {}  - ","pirateBay", pirateBayUrl + input);
+		logger.info("baseurl generated for {} : {}","pirateBay", pirateBayUrl + input);
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(pirateBayUrl + input, String.class);
 		String responseBody = responseEntity.getBody();
 		ObjectMapper mapper = new ObjectMapper();
@@ -265,8 +268,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 						continue;
 					}
 					apiResp.setName(val.getName());
-					String magnetLink = !val.getInfo_hash().isEmpty() ? "magnet:?xt=urn:btih:" + val.getInfo_hash()
-							: "magnet:?xt=urn:btih:";
+					String magnetLink = !val.getInfo_hash().isEmpty() ? "magnet:?xt=urn:btih:" + val.getInfo_hash(): "";
 					apiResp.setMagnetLink(magnetLink);
 					double sizeInGB = (double) Long.parseLong(val.getSize()) / (1024 * 1024 * 1024);
 					String formattedSize = df.format(sizeInGB);
@@ -274,7 +276,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 					apiResp.setSeed(!val.getSeeders().isEmpty() ? Integer.parseInt(val.getSeeders()) : 0);
 					apiResp.setLeech(!val.getLeechers().isEmpty() ? Integer.parseInt(val.getLeechers()) : 0);
 					apiResp.setUploader(PIRATEBAY);
-					apiResp.setDownLoadLink("");
+					apiResp.setDownLoadLink(pirateBayDescription+val.getId());
 					apiResp.setDate(genericService
 							.converTime(!val.getAdded().isEmpty() ? Long.valueOf(val.getAdded()) : null));
 
@@ -308,7 +310,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 						continue;
 					}
 					apiResp.setName(val.getName());
-					String magnetLink = val.getMagnet() != null && !val.getMagnet().isEmpty() ? val.getMagnet() : "magnet:?xt=urn:btih:";
+					String magnetLink = val.getMagnet() != null && !val.getMagnet().isEmpty() ? val.getMagnet() : "";
 					apiResp.setMagnetLink(magnetLink);
 					apiResp.setSize(val.getSize());
 					apiResp.setSeed(val.getSeeder());
