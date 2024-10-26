@@ -73,7 +73,7 @@ public class AsyncServiceImpl implements AsyncService {
 
         for (String val : searchTerm.getSource()) {
             CompletableFuture<List<GenericApiResp>> apiCallFuture = CompletableFuture.supplyAsync(() ->
-                    getApiCall(searchTerm.getInputQuery(), val));
+                    getApiCall(searchTerm.getInputQuery(), val,searchTerm.getTmdbId()));
             apiCallFutures.add(apiCallFuture);
         }
 
@@ -86,13 +86,13 @@ public class AsyncServiceImpl implements AsyncService {
                                 .collect(Collectors.toList()));
     }
 
-    private List<GenericApiResp> getApiCall(String inputQuery, String apiName) {
+    private List<GenericApiResp> getApiCall(String inputQuery, String apiName,String tmdbApiId) {
         if (apiName.equalsIgnoreCase("yts")) {
-            return externalApiService.getCachedYtsRes(inputQuery);
+            return externalApiService.getCachedYtsRes(inputQuery,tmdbApiId);
         } else if (apiName.equalsIgnoreCase("piratebay")) {
-            return externalApiService.getCachedpirateBayRes(inputQuery);
+            return externalApiService.getCachedpirateBayRes(inputQuery,tmdbApiId);
         } else if (apiName.equalsIgnoreCase("snowfl")) {
-            return externalApiService.getCachedSnowFlRes(inputQuery);
+            return externalApiService.getCachedSnowFlRes(inputQuery,tmdbApiId);
         }
         // Add conditions for other APIs  in the future
         return Collections.emptyList();

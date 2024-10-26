@@ -4,6 +4,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -54,7 +57,7 @@ public class GenericService {
 	@Scheduled(fixedRateString = "${auto.refresh.intervalInMillis}")
 	public void evictAllCacheValues() {
 //		TODO - implement using api call (custom clear)
-		logger.info("{}","lorem CacheEvict");
+		logger.info("{}","lorem CacheEvict final change");
 		Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().flushAll();
 	}
 
@@ -109,5 +112,24 @@ public class GenericService {
 			logger.error("Error at: {} {}","fetchURL",e);
 			throw new RuntimeException("Failed to fetch URL: " + urlString, e);
 		}
+	}
+
+	public List<String> getIframes(List<String> existingIframeList,String baseUrl,String source){
+		try{
+			switch (source){
+				case "2embed":
+					Document document = Jsoup.connect(baseUrl).get();
+					Element embedElement = document.getElementById("embed-content");
+					if (embedElement != null && !existingIframeList.contains(embedElement.text())) {
+						existingIframeList.add(embedElement.text());
+					}
+				default:
+					break;
+			}
+		}
+		catch (IOException ignored){
+			logger.error("Error at: {} - at function: {} - not able to fetch data", this.getClass().getSimpleName(), "parsing problem at getIframes()");
+		}
+		return existingIframeList;
 	}
 }

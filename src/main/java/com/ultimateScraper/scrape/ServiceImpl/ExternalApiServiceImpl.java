@@ -1,33 +1,24 @@
 package com.ultimateScraper.scrape.ServiceImpl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.ultimateScraper.scrape.dto.SnowFl;
 import com.ultimateScraper.scrape.utilities.SnowFlCustomServices;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ultimateScraper.scrape.Plugins.SubDtos.YtsMovie;
@@ -60,6 +51,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	private final RestTemplate restTemplate;
 	private final GenericService genericService;
 	private final SnowFlCustomServices snowFlCustomServices;
+	private static List<String> iframeCollections = new ArrayList<>();
 
 	public ExternalApiServiceImpl(RestTemplate restTemplate, GenericService genericService, SnowFlCustomServices snowFlCustomServices) {
 		this.restTemplate = restTemplate;
@@ -167,11 +159,11 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	 */
 
 	@Cacheable(value = "getYtsRes", key = "#input")
-	public List<GenericApiResp> getCachedYtsRes(String input) {
+	public List<GenericApiResp> getCachedYtsRes(String input,String tmdbApiId) {
 //		we need to return List<GenericApiResp>  instead CompletableFuture<List<GenericApiResp>> as serialize issue in redis in springboot at 2.7.5
 
 		try {
-			CompletableFuture<List<GenericApiResp>> completableFuture = getYtsResAsync(input);
+			CompletableFuture<List<GenericApiResp>> completableFuture = getYtsResAsync(input,tmdbApiId);
 			return completableFuture.get(); // Wait for completion and return result
 		} catch (Exception e) {
 			return Collections.emptyList();
@@ -179,11 +171,11 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	}
 
 	@Cacheable(value = "getPirateBayRes", key = "#input")
-	public List<GenericApiResp> getCachedpirateBayRes(String input) {
+	public List<GenericApiResp> getCachedpirateBayRes(String input,String tmdbApiId) {
 //		we need to return List<GenericApiResp>  instead CompletableFuture<List<GenericApiResp>> as serialize issue in redis in java at 2.7.5
 
 		try {
-			CompletableFuture<List<GenericApiResp>> completableFuture = getpirateBayResAsync(input);
+			CompletableFuture<List<GenericApiResp>> completableFuture = getpirateBayResAsync(input,tmdbApiId);
 			return completableFuture.get(); // Wait for completion and return result
 		} catch (Exception e) {
 			return Collections.emptyList();
@@ -192,9 +184,9 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 
 	@Override
 	@Cacheable(value = "getCachedSnowFlRes", key = "#input")
-	public List<GenericApiResp> getCachedSnowFlRes(String input) {
+	public List<GenericApiResp> getCachedSnowFlRes(String input,String tmdbApiId) {
 		try {
-			CompletableFuture<List<GenericApiResp>> completableFuture = getSnowFlAsync(input);
+			CompletableFuture<List<GenericApiResp>> completableFuture = getSnowFlAsync(input,tmdbApiId);
 			return completableFuture.get(); // Wait for completion and return result
 		} catch (Exception e) {
 			return Collections.emptyList();
@@ -202,25 +194,26 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 	}
 
 //	@Async("taskExecutor")
-	public CompletableFuture<List<GenericApiResp>> getYtsResAsync(String input) {
-		return CompletableFuture.supplyAsync(() -> fetchYtsData(input));
+	public CompletableFuture<List<GenericApiResp>> getYtsResAsync(String input,String tmdbApiId) {
+		return CompletableFuture.supplyAsync(() -> fetchYtsData(input,tmdbApiId));
 	}
 
 //	@Async("taskExecutor")
-	public CompletableFuture<List<GenericApiResp>> getpirateBayResAsync(String input) {
-		return CompletableFuture.supplyAsync(() -> fetchpirateBayData(input));
+	public CompletableFuture<List<GenericApiResp>> getpirateBayResAsync(String input,String tmdbApiId) {
+		return CompletableFuture.supplyAsync(() -> fetchpirateBayData(input,tmdbApiId));
 	}
 
 //	@Async("taskExecutor")
-	public CompletableFuture<List<GenericApiResp>> getSnowFlAsync(String input) {
-		return CompletableFuture.supplyAsync(() -> fetchSnowFlData(input));
+	public CompletableFuture<List<GenericApiResp>> getSnowFlAsync(String input,String tmdbApiId) {
+		return CompletableFuture.supplyAsync(() -> fetchSnowFlData(input,tmdbApiId));
 	}
-	private List<GenericApiResp> fetchYtsData(String input) {
+	private List<GenericApiResp> fetchYtsData(String input,String tmdbApiId) {
 		List<GenericApiResp> allDatas = new ArrayList<>();
 		logger.info("baseurl generated for {} : {}  - ","YTS", YtsUrl + input);
 		try {
 			Yts response = restTemplate.getForObject(YtsUrl + input, Yts.class);
 			List<YtsMovie> data = response != null ? response.getData().getMovies() : null;
+			iframeCollections =  genericService.getIframes(iframeCollections,"https://www.2embed.skin/movie/"+tmdbApiId,"2embed");
 			if (data != null) {
 				for (YtsMovie val : data) {
 					GenericApiResp apiResp = new GenericApiResp();
@@ -241,6 +234,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 					apiResp.setDate(genericService.converTime(
 							!val.getTorrents().isEmpty() ? val.getTorrents().get(0).getDate_uploaded_unix() : null));
 					apiResp.setImage(val.getLarge_cover_image());
+					apiResp.setIframes(iframeCollections);
 					allDatas.add(apiResp);
 				}
 			}
@@ -251,13 +245,14 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 		}
 	}
 
-	private List<GenericApiResp> fetchpirateBayData(String input) {
+	private List<GenericApiResp> fetchpirateBayData(String input,String tmdbApiId) {
 		List<GenericApiResp> allDatas = new ArrayList<>();
 		DecimalFormat df = new DecimalFormat("#.##");
 		logger.info("baseurl generated for {} : {}","pirateBay", pirateBayUrl + input);
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(pirateBayUrl + input, String.class);
 		String responseBody = responseEntity.getBody();
 		ObjectMapper mapper = new ObjectMapper();
+		iframeCollections =  genericService.getIframes(iframeCollections,"https://www.2embed.skin/movie/"+tmdbApiId,"2embed");
 		try {
 			List<PirateBay> response = mapper.readValue(responseBody, new TypeReference<List<PirateBay>>() {
 			});
@@ -276,6 +271,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 					apiResp.setSeed(!val.getSeeders().isEmpty() ? Integer.parseInt(val.getSeeders()) : 0);
 					apiResp.setLeech(!val.getLeechers().isEmpty() ? Integer.parseInt(val.getLeechers()) : 0);
 					apiResp.setUploader(PIRATEBAY);
+					apiResp.setIframes(iframeCollections);
 					apiResp.setDownLoadLink(pirateBayDescription+val.getId());
 					apiResp.setDate(genericService
 							.converTime(!val.getAdded().isEmpty() ? Long.valueOf(val.getAdded()) : null));
@@ -292,13 +288,15 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 		return allDatas;
 	}
 
-	private List<GenericApiResp> fetchSnowFlData(String input) {
+	private List<GenericApiResp> fetchSnowFlData(String input,String tmdbApiId) {
 //		TODO - add header
 		List<Map.Entry<String, String>> headers = new ArrayList<>();
 		List<GenericApiResp> allDatas = new ArrayList<>();
 		String token = snowFlCustomServices.fetchToken(snowFlUrl, headers);
 		String query = snowFlCustomServices.generateQuery(input, token, snowFlUrl);
 		logger.info("baseurl generated for {} : {}  - ","SnowFl", query);
+		iframeCollections =  genericService.getIframes(iframeCollections,"https://www.2embed.skin/embed/"+tmdbApiId,"2embed");
+
 		try {
 			String resp = genericService.fetchURL(query, headers);
 			Gson gson = new Gson();
@@ -319,7 +317,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
 					apiResp.setDownLoadLink(val.getUrl());
 					apiResp.setDate(val.getAge());
 					apiResp.setImage("");
-
+					apiResp.setIframes(iframeCollections);
 					allDatas.add(apiResp);
 				}
 			}

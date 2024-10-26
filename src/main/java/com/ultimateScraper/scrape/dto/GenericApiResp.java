@@ -1,6 +1,7 @@
 package com.ultimateScraper.scrape.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 
@@ -14,6 +15,7 @@ public class GenericApiResp extends JdkSerializationRedisSerializer implements S
 	private String downLoadLink;
 	private String date;
 	private String image;
+	private List<String> iframes;
 
 	public String getName() {
 		return name;
@@ -87,4 +89,11 @@ public class GenericApiResp extends JdkSerializationRedisSerializer implements S
 		this.leech = leech;
 	}
 
+	public List<String> getIframes() {
+		return iframes;
+	}
+
+	public void setIframes(List<String> iframes) {
+		this.iframes = iframes;
+	}
 }

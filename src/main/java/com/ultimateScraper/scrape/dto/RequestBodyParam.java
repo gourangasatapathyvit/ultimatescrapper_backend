@@ -5,6 +5,7 @@ import java.util.List;
 
 public class RequestBodyParam implements Serializable{
 	private String inputQuery;
+	private String tmdbId;
 	private List<String> source;
 	private String catagory;
 
@@ -33,4 +34,11 @@ public class RequestBodyParam implements Serializable{
 		this.catagory = catagory;
 	}
 
+	public String getTmdbId() {
+		return tmdbId;
+	}
+
+	public void setTmdbId(String tmdbId) {
+		this.tmdbId = tmdbId;
+	}
 }
