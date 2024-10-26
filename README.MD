@@ -10,3 +10,15 @@
 **RUN API GATEWAY**
 
 `docker run --name gateway-service --network scrape-net -p 8084:8084 -e SPRING_PROFILE=docker -e REDIS_HOST=redisServe -e SPRING_LOGGING.LEVEL=debug -e LB_SCRAPESERVICE_URL=http://scrape-service:8090 -d gouranga1234/apigateway:1.0.9`
+
+
+**REST API**
+
+`http://localhost:8084/scrape/getAllRes`
+
+body -
+`{
+"inputQuery":"rrr",
+"source":["piratebay"],
+"catagory":"movies",
+"tmdbId":579974 }`
