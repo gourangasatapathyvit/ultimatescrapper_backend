@@ -11,6 +11,7 @@ import com.ultimateScraper.scrape.utilities.RateLimitFilter;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.example.ModuleConfigurationApp;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -28,12 +29,18 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableAsync
 @EnableCaching
 @Import({ModuleConfigurationApp.class})
 public class AppConfig {
+
+    @Value("${allowed.origins}")
+    private String allowedOrigins;
+
     @Bean
     public Gson gson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -90,6 +97,11 @@ public class AppConfig {
         executor.setThreadNamePrefix("async-service-taskExecutor-");
         executor.initialize();
         return executor;
+    }
+
+    @Bean
+    public List<String> allowedOrigins() {
+        return Arrays.asList(allowedOrigins.split(","));
     }
 
 //    @Bean

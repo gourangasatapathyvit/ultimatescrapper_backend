@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.ultimateScraper</groupId>
 	<artifactId>scrape</artifactId>
-	<version>1.2.8</version>
+	<version>1.2.9</version>
 	<name>scrape</name>
 	<description>Demo project for Spring Boot</description>
     <properties>
@@ -93,7 +93,7 @@
 		<dependency>
 			<groupId>com.github.gourangasatapathyvit</groupId>
 			<artifactId>scrapemodule</artifactId>
-			<version>805a096091</version>
+			<version>3a9476e340</version>
 		</dependency>
 
 
